@@ -1,0 +1,7 @@
+/.idea/
+/backend/node_modules/
+/backend/.env
+/backend/api.http
+/frontend/.vscode/
+/frontend/.env
+/frontend/node_modules/
