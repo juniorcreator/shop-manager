@@ -1,6 +1,13 @@
 export interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
+  password?: string;
   created_at: Date;
+}
+
+export interface ApiResponse<T> {
+  status: number;
+  message: string;
+  data: T;
 }
