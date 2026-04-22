@@ -3,6 +3,7 @@
 /backend/.env
 /backend/api.http
 /frontend/.vscode/
+/frontend/.env.d.ts
 /frontend/.env
 /frontend/node_modules/
 /frontend/dist/
