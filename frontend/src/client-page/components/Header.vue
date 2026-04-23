@@ -1,5 +1,9 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { navLinks } from '@/client-page/utils/constants.ts';
+import CartPopup from '@/client-page/components/CartPopup.vue';
+
+const isCartVisible = ref(false);
 </script>
 
 <template>
@@ -28,10 +32,6 @@ import { navLinks } from '@/client-page/utils/constants.ts';
       </nav>
 
       <div class="flex items-center gap-4 text-gray-700">
-        <button class="p-2 hover:bg-gray-50 rounded-full transition-colors relative">
-          <i class="pi pi-search text-xl"></i>
-        </button>
-
         <div class="hidden sm:flex items-center gap-4 border-l border-gray-200 ml-2 pl-6">
           <RouterLink class="text-sm font-semibold hover:text-emerald-600" to="/login"
             >Вхід</RouterLink
@@ -43,11 +43,14 @@ import { navLinks } from '@/client-page/utils/constants.ts';
           >
         </div>
 
-        <button class="p-2 hover:bg-gray-50 rounded-full transition-colors relative ml-2">
+        <button
+          @click="isCartVisible = true"
+          class="p-2 hover:bg-gray-50 rounded-full transition-colors relative ml-2"
+        >
           <i class="pi pi-shopping-cart" style="font-size: 1.8rem"></i>
           <span
             class="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white"
-            >0</span
+            >2</span
           >
         </button>
 
@@ -56,6 +59,7 @@ import { navLinks } from '@/client-page/utils/constants.ts';
         </RouterLink>
       </div>
     </div>
+    <CartPopup v-model:visible="isCartVisible" />
   </header>
 </template>
 

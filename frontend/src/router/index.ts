@@ -43,6 +43,11 @@ const router = createRouter({
       name: 'register',
       component: () => import('@/client-page/views/RegisterView.vue'),
     },
+    {
+      path: '/checkout',
+      name: 'checkout',
+      component: () => import('@/client-page/views/CheckoutView.vue'),
+    },
   ],
 });
 
