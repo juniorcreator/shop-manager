@@ -30,11 +30,11 @@ const stats = ref([
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 min-h-[300px]">
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 min-h-75">
         <h3 class="text-lg font-bold text-gray-800 mb-4">Останні замовлення</h3>
         <p class="text-gray-400 text-center py-12 italic">Тут буде графік або список замовлень</p>
       </div>
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 min-h-[300px]">
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 min-h-75">
         <h3 class="text-lg font-bold text-gray-800 mb-4">Популярні товари</h3>
         <p class="text-gray-400 text-center py-12 italic">Тут буде список популярних товарів</p>
       </div>

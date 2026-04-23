@@ -38,7 +38,7 @@ const filters = ref({
         </div>
       </template>
 
-      <Column field="id" header="ID" sortable style="width: 10%"></Column>
+      <Column field="id" header="ID" :sortable="true" style="width: 10%"></Column>
       <Column header="Зображення" style="width: 15%">
         <template #body="slotProps">
           <img
@@ -48,8 +48,8 @@ const filters = ref({
           />
         </template>
       </Column>
-      <Column field="name" header="Назва" sortable style="width: 40%"></Column>
-      <Column field="price" header="Ціна" sortable style="width: 15%">
+      <Column field="name" header="Назва" :sortable="true" style="width: 40%"></Column>
+      <Column field="price" header="Ціна" :sortable="true" style="width: 15%">
         <template #body="slotProps">
           <span class="font-bold text-emerald-600">{{ slotProps.data.price }} ₴</span>
         </template>
