@@ -8,6 +8,7 @@ import { reactive } from 'vue';
 
 const formData = reactive({
   name: '',
+  serNamer: '',
   email: '',
   password: '',
 });
@@ -20,13 +21,25 @@ const formData = reactive({
       <InputGroupAddon>
         <i class="pi pi-user"></i>
       </InputGroupAddon>
-      <InputText v-model="formData.name" placeholder="Name" />
+      <InputText required v-model="formData.name" placeholder="Name" />
+    </InputGroup>
+    <InputGroup>
+      <InputGroupAddon>
+        <i class="pi pi-user"></i>
+      </InputGroupAddon>
+      <InputText v-model="formData.serNamer" placeholder="Ser Name optional" />
     </InputGroup>
     <InputGroup>
       <InputGroupAddon>
         <i class="pi pi-envelope"></i>
       </InputGroupAddon>
-      <InputText autocomplete="email" type="email" v-model="formData.email" placeholder="Email" />
+      <InputText
+        required
+        autocomplete="email"
+        type="email"
+        v-model="formData.email"
+        placeholder="Email"
+      />
     </InputGroup>
     <InputGroup>
       <InputGroupAddon>
@@ -34,6 +47,7 @@ const formData = reactive({
       </InputGroupAddon>
       <Password
         v-model="formData.password"
+        required
         placeholder="Password"
         :inputProps="{ autocomplete: 'new-password' }"
         meter="false"

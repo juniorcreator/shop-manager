@@ -45,7 +45,7 @@ const isCartVisible = ref(false);
 
         <button
           @click="isCartVisible = true"
-          class="p-2 hover:bg-gray-50 rounded-full transition-colors relative ml-2"
+          class="p-2 hover:bg-gray-50 cursor-pointer rounded-full transition-colors relative ml-2"
         >
           <i class="pi pi-shopping-cart" style="font-size: 1.8rem"></i>
           <span

@@ -73,14 +73,14 @@ const goToCheckout = () => {
           <span class="font-bold text-emerald-600">{{ item.price * item.quantity }} ₴</span>
           <button
             @click="removeItem(item.id)"
-            class="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"
+            class="p-2 text-red-500 cursor-pointer hover:bg-red-50 rounded-full transition-colors"
           >
             <i class="pi pi-trash"></i>
           </button>
         </div>
       </div>
 
-      <div class="mt-4 pt-4 border-t flex justify-between items-center">
+      <div class="mt-4 flex justify-between items-center">
         <span class="text-xl font-bold text-gray-800">Разом:</span>
         <span class="text-2xl font-black text-emerald-600">{{ totalPrice }} ₴</span>
       </div>
@@ -88,13 +88,13 @@ const goToCheckout = () => {
       <div class="mt-6 flex flex-col sm:flex-row gap-3">
         <button
           @click="updateVisible(false)"
-          class="flex-1 py-3 border border-gray-300 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
+          class="flex-1 py-3 cursor-pointer border border-gray-300 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
         >
           Продовжити покупки
         </button>
         <button
           @click="goToCheckout"
-          class="flex-1 py-3 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition-colors"
+          class="flex-1 py-3 cursor-pointer bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition-colors"
         >
           Оформити замовлення
         </button>
