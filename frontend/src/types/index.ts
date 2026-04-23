@@ -12,6 +12,19 @@ export interface ApiResponse<T> {
   data: T;
 }
 
+export interface Subcategory {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  image: string;
+  subcategories: Subcategory[];
+}
 export interface Product {
   id: number;
   name: string;

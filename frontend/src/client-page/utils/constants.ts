@@ -1,5 +1,56 @@
 import { ref } from 'vue';
-import type { BlogPost, Product } from '@/types';
+import type { Product, Category, BlogPost } from '@/types';
+
+export const categories: Category[] = [
+  {
+    id: '1',
+    name: 'Насіння',
+    slug: 'seeds',
+    image:
+      'https://images.unsplash.com/photo-1597848212624-a19eb35e2651?auto=format&fit=crop&q=80&w=400',
+    subcategories: [
+      { id: '1-1', name: 'Овочі', slug: 'vegetables' },
+      { id: '1-2', name: 'Квіти', slug: 'flowers' },
+      { id: '1-3', name: 'Трави', slug: 'herbs' },
+    ],
+  },
+  {
+    id: '2',
+    name: 'Інструменти',
+    slug: 'tools',
+    image:
+      'https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&q=80&w=400',
+    subcategories: [
+      { id: '2-1', name: 'Лопати', slug: 'shovels' },
+      { id: '2-2', name: 'Секатори', slug: 'pruners' },
+      { id: '2-3', name: 'Граблі', slug: 'rakes' },
+    ],
+  },
+  {
+    id: '3',
+    name: 'Полив',
+    slug: 'watering',
+    image:
+      'https://images.unsplash.com/photo-1592419044706-39796d40f98c?auto=format&fit=crop&q=80&w=400',
+    subcategories: [
+      { id: '3-1', name: 'Шланги', slug: 'hoses' },
+      { id: '3-2', name: 'Лейки', slug: 'watering-cans' },
+      { id: '3-3', name: 'Обприскувачі', slug: 'sprayers' },
+    ],
+  },
+  {
+    id: '4',
+    name: 'Добрива',
+    slug: 'fertilizers',
+    image:
+      'https://images.unsplash.com/photo-1615811361523-6bd03d7748e7?auto=format&fit=crop&q=80&w=400',
+    subcategories: [
+      { id: '4-1', name: 'Органічні', slug: 'organic' },
+      { id: '4-2', name: 'Мінеральні', slug: 'mineral' },
+      { id: '4-3', name: 'Для розсади', slug: 'seedlings' },
+    ],
+  },
+];
 
 export const products = ref<Product[]>([
   {
