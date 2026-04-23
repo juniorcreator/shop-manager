@@ -187,4 +187,8 @@ export const navLinks = [
     to: 'about',
     name: 'Про нас',
   },
+  {
+    to: 'admin',
+    name: 'Amin',
+  },
 ];

@@ -15,7 +15,7 @@ import { navLinks } from '@/client-page/utils/constants.ts';
       </div>
 
       <nav class="hidden md:block">
-        <ul class="flex gap-8 text-lg font-medium text-gray-600">
+        <ul class="flex gap-7 text-lg font-medium text-gray-600">
           <li v-for="link in navLinks" :key="link.name">
             <RouterLink
               active-class="bg-[#eee7d5]"
