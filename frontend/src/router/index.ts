@@ -6,7 +6,35 @@ const router = createRouter({
     {
       path: '/admin',
       name: 'admin',
+      redirect: { name: 'admin-dashboard' },
       component: () => import('@/admin-page/views/AdminView.vue'),
+      children: [
+        {
+          path: '',
+          name: 'admin-dashboard',
+          component: () => import('@/admin-page/views/DashboardView.vue'),
+        },
+        {
+          path: 'products',
+          name: 'admin-products',
+          component: () => import('@/admin-page/views/ProductsView.vue'),
+        },
+        {
+          path: 'categories',
+          name: 'admin-categories',
+          component: () => import('@/admin-page/views/CategoriesAdminView.vue'),
+        },
+        {
+          path: 'users',
+          name: 'admin-users',
+          component: () => import('@/admin-page/views/UsersView.vue'),
+        },
+        {
+          path: 'blog',
+          name: 'admin-blog',
+          component: () => import('@/admin-page/views/BlogAdminView.vue'),
+        },
+      ],
     },
     {
       path: '/',

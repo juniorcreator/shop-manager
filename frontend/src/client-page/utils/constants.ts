@@ -189,6 +189,6 @@ export const navLinks = [
   },
   {
     to: 'admin',
-    name: 'Amin',
+    name: 'Admin',
   },
 ];
