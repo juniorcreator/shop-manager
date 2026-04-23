@@ -7,6 +7,7 @@ const route = useRoute();
 const menuItems = [
   { label: 'Дашборд', icon: 'pi pi-home', to: 'admin-dashboard' },
   { label: 'Товари', icon: 'pi pi-shopping-bag', to: 'admin-products' },
+  { label: 'Замовлення', icon: 'pi pi-shopping-cart', to: 'admin-orders' },
   { label: 'Категорії', icon: 'pi pi-tags', to: 'admin-categories' },
   { label: 'Користувачі', icon: 'pi pi-users', to: 'admin-users' },
   { label: 'Блог', icon: 'pi pi-pencil', to: 'admin-blog' },
@@ -15,7 +16,6 @@ const menuItems = [
 
 <template>
   <div class="flex h-screen bg-gray-50 overflow-hidden font-sans">
-    <!-- Sidebar -->
     <aside class="w-64 bg-white border-r border-gray-200 flex flex-col z-20">
       <div class="p-6 border-b border-gray-100 flex items-center gap-3">
         <i class="pi pi-cog text-emerald-600 text-2xl"></i>
@@ -50,9 +50,7 @@ const menuItems = [
       </div>
     </aside>
 
-    <!-- Main Content -->
     <div class="flex-1 flex flex-col overflow-hidden relative">
-      <!-- Top Header -->
       <header
         class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 z-10"
       >
@@ -76,7 +74,6 @@ const menuItems = [
         </div>
       </header>
 
-      <!-- Content Area -->
       <main class="flex-1 overflow-y-auto p-8 bg-gray-50">
         <router-view></router-view>
       </main>

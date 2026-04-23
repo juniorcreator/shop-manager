@@ -43,3 +43,28 @@ export interface BlogPost {
   date: string;
   author: string;
 }
+
+export interface OrderItem {
+  id: number;
+  product_id: number;
+  product_name: string;
+  quantity: number;
+  price: number;
+}
+
+export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+
+export interface Order {
+  id: number;
+  user_id?: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  delivery_address: string;
+  payment_method: string;
+  status: OrderStatus;
+  total_price: number;
+  comment?: string;
+  created_at: string;
+  items: OrderItem[];
+}
