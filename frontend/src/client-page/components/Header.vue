@@ -33,10 +33,14 @@ const isCartVisible = ref(false);
 
       <div class="flex items-center gap-4 text-gray-700">
         <div class="hidden sm:flex items-center gap-4 border-l border-gray-200 ml-2 pl-6">
-          <RouterLink class="text-sm font-semibold hover:text-emerald-600" to="/login"
+          <RouterLink
+            active-class="text-emerald-600"
+            class="text-sm font-semibold hover:text-emerald-600"
+            to="/login"
             >Вхід</RouterLink
           >
           <RouterLink
+            active-class="bg-emerald-700"
             class="text-sm font-semibold bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
             to="/register"
             >Реєстрація</RouterLink

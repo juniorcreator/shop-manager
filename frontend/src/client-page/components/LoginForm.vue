@@ -56,7 +56,14 @@ const handleSubmit = (): void => {
       <InputGroupAddon>
         <i class="pi pi-envelope"></i>
       </InputGroupAddon>
-      <InputText autocomplete="email" type="email" v-model="formData.email" placeholder="Email" />
+      <InputText
+        minlength="8"
+        required
+        autocomplete="email"
+        type="email"
+        v-model="formData.email"
+        placeholder="Email"
+      />
     </InputGroup>
     <InputGroup>
       <InputGroupAddon>
@@ -66,7 +73,9 @@ const handleSubmit = (): void => {
         v-model="formData.password"
         placeholder="Password"
         :inputProps="{ autocomplete: 'current-password' }"
-        meter="false"
+        :feedback="false"
+        minlength="4"
+        required
         toggleMask
       />
     </InputGroup>
