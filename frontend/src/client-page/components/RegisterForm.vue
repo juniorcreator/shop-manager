@@ -4,30 +4,81 @@ import Button from 'primevue/button';
 import InputGroup from 'primevue/inputgroup';
 import Password from 'primevue/password';
 import InputText from 'primevue/inputtext';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useToast } from 'primevue/usetoast';
+import type { User } from '@/types';
 import { reactive } from 'vue';
+import api from '@/api';
 
-const formData = reactive({
+const toast = useToast();
+const queryClient = useQueryClient();
+const initialState = {
   name: '',
-  serNamer: '',
+  surname: '',
   email: '',
   password: '',
+};
+const formData = reactive({ ...initialState });
+const mutation = useMutation({
+  mutationFn: async (newUserData: Omit<User, 'id' | 'created_at'>) => {
+    const response = await api.post<User>('/users', newUserData);
+    console.log(response, 'response useMutation client');
+    return response;
+  },
+
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['users'] });
+    Object.assign(formData, initialState);
+    toast.add({
+      severity: 'success',
+      summary: 'Успіх',
+      detail: 'Користувача успішно зареєстровано',
+      life: 3000,
+    });
+  },
+  onError: (err: any) => {
+    const errorMessage = err.response?.data?.message || 'Помилка при реєстрації';
+    console.log(err.error, ' err onError client');
+    console.log(errorMessage, ' errorMessage');
+    toast.add({
+      severity: 'error',
+      summary: 'Помилка',
+      detail: errorMessage,
+      life: 5000,
+    });
+    console.error('Registration error:', err);
+  },
 });
+
+const handleSubmit = (): void => {
+  mutation.mutate({ ...formData });
+};
 </script>
 
 <template>
-  <form class="max-w-100 m-auto flex flex-col gap-2">
-    <div>Register Form</div>
+  <form @submit.prevent="handleSubmit" class="w-full max-w-sm m-auto flex flex-col gap-4">
+    <h2 class="text-xl font-bold text-gray-800 text-center mb-2">Реєстрація</h2>
     <InputGroup>
       <InputGroupAddon>
         <i class="pi pi-user"></i>
       </InputGroupAddon>
-      <InputText required v-model="formData.name" placeholder="Name" />
+      <InputText
+        :minlength="3"
+        :maxlength="20"
+        required
+        v-model="formData.name"
+        placeholder="Ім'я"
+      />
     </InputGroup>
     <InputGroup>
       <InputGroupAddon>
         <i class="pi pi-user"></i>
       </InputGroupAddon>
-      <InputText v-model="formData.serNamer" placeholder="Ser Name optional" />
+      <InputText
+        :maxlength="20"
+        v-model="formData.surname"
+        placeholder="Прізвище (необов'язково)"
+      />
     </InputGroup>
     <InputGroup>
       <InputGroupAddon>
@@ -48,13 +99,19 @@ const formData = reactive({
       <Password
         v-model="formData.password"
         required
-        placeholder="Password"
+        placeholder="Пароль"
         :inputProps="{ autocomplete: 'new-password' }"
-        meter="false"
         toggleMask
+        :feedback="false"
       />
     </InputGroup>
-    <Button label="Register" type="submit" severity="help" />
+    <Button
+      :label="mutation.isPending.value ? 'Реєстрація...' : 'Зареєструвати'"
+      :disabled="mutation.isPending.value"
+      type="submit"
+      severity="success"
+      class="mt-2"
+    />
   </form>
 </template>
 

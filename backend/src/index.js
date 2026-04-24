@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import pool from "./config/db.js";
 import userRoutes from "./routes/usersRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.get("/", async (req, res) => {
   });
 });
 app.use("/api", userRoutes);
+app.use("/api", authRoutes);
 
 //middleware
 app.use(errorHandler);
