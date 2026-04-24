@@ -81,6 +81,11 @@ const router = createRouter({
       name: 'checkout',
       component: () => import('@/client-page/views/CheckoutView.vue'),
     },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('@/client-page/views/ProfileView.vue'),
+    },
   ],
 });
 

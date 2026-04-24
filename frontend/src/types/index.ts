@@ -1,5 +1,5 @@
 export interface User {
-  id: string;
+  id: number;
   name: string;
   surname: string;
   email: string;
@@ -56,7 +56,7 @@ export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | '
 
 export interface Order {
   id: number;
-  user_id?: string;
+  user_id?: number;
   customer_name: string;
   customer_email: string;
   customer_phone: string;
@@ -67,4 +67,14 @@ export interface Order {
   comment?: string;
   created_at: string;
   items: OrderItem[];
+}
+
+export interface Comment {
+  id: number;
+  product_id: number;
+  product_name: string;
+  user_id: number;
+  text: string;
+  rating: number;
+  created_at: string;
 }

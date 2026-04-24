@@ -35,6 +35,13 @@ const isCartVisible = ref(false);
         <div class="hidden sm:flex items-center gap-4 border-l border-gray-200 ml-2 pl-6">
           <RouterLink
             active-class="text-emerald-600"
+            class="p-1 hover:text-emerald-600 transition-colors"
+            to="/profile"
+          >
+            <i class="pi pi-user" style="font-size: 1.4rem"></i>
+          </RouterLink>
+          <RouterLink
+            active-class="text-emerald-600"
             class="text-sm font-semibold hover:text-emerald-600"
             to="/login"
             >Вхід</RouterLink
