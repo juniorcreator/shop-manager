@@ -14,14 +14,14 @@ const toast = useToast();
 const queryClient = useQueryClient();
 const initialState = {
   name: '',
-  surname: '',
   email: '',
+  surname: '',
   password: '',
 };
 const formData = reactive({ ...initialState });
 const mutation = useMutation({
   mutationFn: async (newUserData: Omit<User, 'id' | 'created_at'>) => {
-    const response = await api.post<User>('/users', newUserData);
+    const response = await api.post<User>('/register', newUserData);
     console.log(response, 'response useMutation client');
     return response;
   },

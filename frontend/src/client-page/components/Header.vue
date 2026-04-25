@@ -1,9 +1,22 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { navLinks } from '@/client-page/utils/constants.ts';
 import CartPopup from '@/client-page/components/CartPopup.vue';
+import { useRoute, useRouter } from 'vue-router';
+import Button from 'primevue/button';
 
 const isCartVisible = ref(false);
+const router = useRouter();
+const route = useRoute();
+
+const isLoggedIn = computed(() => {
+  return !!route.path && !!localStorage.getItem('token');
+});
+const handleLogOut = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  router.push('/login');
+};
 </script>
 
 <template>
@@ -34,24 +47,38 @@ const isCartVisible = ref(false);
       <div class="flex items-center gap-4 text-gray-700">
         <div class="hidden sm:flex items-center gap-4 border-l border-gray-200 ml-2 pl-6">
           <RouterLink
+            v-if="isLoggedIn"
             active-class="text-emerald-600"
             class="p-1 hover:text-emerald-600 transition-colors"
             to="/profile"
           >
             <i class="pi pi-user" style="font-size: 1.4rem"></i>
           </RouterLink>
-          <RouterLink
-            active-class="text-emerald-600"
-            class="text-sm font-semibold hover:text-emerald-600"
-            to="/login"
-            >Вхід</RouterLink
-          >
-          <RouterLink
-            active-class="bg-emerald-700"
-            class="text-sm font-semibold bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
-            to="/register"
-            >Реєстрація</RouterLink
-          >
+
+          <template v-if="!isLoggedIn">
+            <RouterLink
+              active-class="text-emerald-600"
+              class="text-sm font-semibold hover:text-emerald-600"
+              to="/login"
+              >Вхід</RouterLink
+            >
+            <RouterLink
+              active-class="bg-emerald-700"
+              class="text-sm font-semibold bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
+              to="/register"
+              >Реєстрація</RouterLink
+            >
+          </template>
+
+          <Button
+            v-else
+            icon="pi pi-sign-out"
+            label="Вихід"
+            severity="danger"
+            text
+            size="small"
+            @click="handleLogOut"
+          />
         </div>
 
         <button

@@ -1,5 +1,7 @@
 import { handleResponse } from "../utils/index.js";
 import { registerUserService, loginUserService } from "../models/authModel.js";
+import jwt from "jsonwebtoken";
+import "dotenv/config";
 
 export const registerUser = async (req, res, next) => {
   const { name, surname, email, password } = req.body;
@@ -18,8 +20,15 @@ export const loginUser = async (req, res, next) => {
   console.log(req.body, " req.body in loginUser api");
   try {
     const user = await loginUserService(email, password);
+    const token = jwt.sign(
+      { id: user.id, role: user.role, email: user.email },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "2h",
+      },
+    );
     console.log(user, "user loginUser");
-    handleResponse(res, 200, "User logged successfully api", user);
+    handleResponse(res, 200, "User logged successfully api", { user, token });
   } catch (err) {
     console.log(err, " loginUser api 11");
     next(err);

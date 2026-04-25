@@ -7,28 +7,36 @@ import InputText from 'primevue/inputtext';
 import { useMutation } from '@tanstack/vue-query';
 import { reactive } from 'vue';
 import { useToast } from 'primevue/usetoast';
+import { useRouter } from 'vue-router';
 import type { User } from '@/types';
 import api from '@/api';
 
 const toast = useToast();
+const router = useRouter();
 const initialState = { email: '', password: '' };
 const formData = reactive({ ...initialState });
 
 const mutation = useMutation({
   mutationFn: async (user: Pick<User, 'email' | 'password'>) => {
-    const response = await api.post<User>('/login', user);
+    const response = await api.post<{ data: { user: User; token: string } }>('/login', user);
     console.log(response, 'response useMutation client');
     return response;
   },
 
-  onSuccess: () => {
-    Object.assign(formData, initialState);
+  onSuccess: (response) => {
+    console.log(response, 'response useMutation client login');
+    const { user, token } = response.data.data;
+    console.log(token, user, 'token and user client login');
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(user));
     toast.add({
       severity: 'success',
       summary: 'Успіх',
       detail: 'Користувача успішно залогігений',
       life: 3000,
     });
+    Object.assign(formData, initialState);
+    router.push('/');
   },
   onError: (err: any) => {
     const errorMessage = err.response?.data?.message || 'Помилка при вході';

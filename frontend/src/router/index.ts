@@ -8,6 +8,7 @@ const router = createRouter({
       name: 'admin',
       redirect: { name: 'admin-dashboard' },
       component: () => import('@/admin-page/views/AdminView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
       children: [
         {
           path: '',
@@ -85,8 +86,27 @@ const router = createRouter({
       path: '/profile',
       name: 'profile',
       component: () => import('@/client-page/views/ProfileView.vue'),
+      meta: { requiresAuth: true },
     },
   ],
+});
+
+router.beforeEach(async (to, from) => {
+  const userJson = localStorage.getItem('user');
+  const user = userJson ? JSON.parse(userJson) : null;
+  const isAuthenticated = !!localStorage.getItem('token');
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+
+  if (requiresAuth && !isAuthenticated) {
+    return { path: '/' };
+  }
+  if (to.path === '/login' && isAuthenticated) {
+    return { path: '/' };
+  }
+  if (to.meta.requiresAdmin && user?.role !== 'admin') {
+    return '/';
+  }
+  return true;
 });
 
 export default router;
