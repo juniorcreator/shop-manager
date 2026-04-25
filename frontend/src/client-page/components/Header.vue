@@ -4,10 +4,13 @@ import { navLinks } from '@/client-page/utils/constants.ts';
 import CartPopup from '@/client-page/components/CartPopup.vue';
 import { useRoute, useRouter } from 'vue-router';
 import Button from 'primevue/button';
+import Avatar from 'primevue/avatar';
+import { useUserStore } from '@/stores/user.ts';
 
 const isCartVisible = ref(false);
 const router = useRouter();
 const route = useRoute();
+const userStore = useUserStore();
 
 const isLoggedIn = computed(() => {
   return !!route.path && !!localStorage.getItem('token');
@@ -15,6 +18,7 @@ const isLoggedIn = computed(() => {
 const handleLogOut = () => {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
+  userStore.clearUser();
   router.push('/login');
 };
 </script>
@@ -52,7 +56,12 @@ const handleLogOut = () => {
             class="p-1 hover:text-emerald-600 transition-colors"
             to="/profile"
           >
-            <i class="pi pi-user" style="font-size: 1.4rem"></i>
+            <Avatar
+              image="/front/images/default-avatar.avif"
+              class="mr-2"
+              size="large"
+              shape="circle"
+            />
           </RouterLink>
 
           <template v-if="!isLoggedIn">

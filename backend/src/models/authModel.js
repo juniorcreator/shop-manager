@@ -23,7 +23,7 @@ export const registerUserService = async (name, surname, email, password) => {
 };
 export const loginUserService = async (email, password) => {
   const result = await pool.query(
-    "SELECT id, name, surname, email, password FROM users WHERE email = $1",
+    "SELECT id, name, surname, email, password, image, role FROM users WHERE email = $1",
     [email],
   );
   const user = result.rows[0];

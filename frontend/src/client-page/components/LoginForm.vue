@@ -9,12 +9,14 @@ import { reactive } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useRouter } from 'vue-router';
 import type { User } from '@/types';
+import { useUserStore } from '@/stores/user.ts';
 import api from '@/api';
 
 const toast = useToast();
 const router = useRouter();
 const initialState = { email: '', password: '' };
 const formData = reactive({ ...initialState });
+const userStore = useUserStore();
 
 const mutation = useMutation({
   mutationFn: async (user: Pick<User, 'email' | 'password'>) => {
@@ -26,9 +28,9 @@ const mutation = useMutation({
   onSuccess: (response) => {
     console.log(response, 'response useMutation client login');
     const { user, token } = response.data.data;
-    console.log(token, user, 'token and user client login');
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
+    userStore.setUser(user, token);
     toast.add({
       severity: 'success',
       summary: 'Успіх',
