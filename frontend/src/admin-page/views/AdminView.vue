@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import Button from 'primevue/button';
+import { useUserStore } from '@/stores/user.ts';
 
 const route = useRoute();
+const userStore = useUserStore();
 
 const menuItems = [
   { label: 'Дашборд', icon: 'pi pi-home', to: 'admin-dashboard' },
@@ -63,7 +65,7 @@ const menuItems = [
           <div class="flex items-center gap-3 pl-4 border-l border-gray-100">
             <div class="text-right">
               <p class="text-sm font-bold text-gray-800 leading-tight">Адміністратор</p>
-              <p class="text-xs text-gray-500">admin@garden.shop</p>
+              <p v-if="userStore.user" class="text-xs text-gray-500">{{ userStore.user.email }}}</p>
             </div>
             <div
               class="w-10 h-10 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-bold"

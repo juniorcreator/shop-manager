@@ -11,5 +11,8 @@ const pool = new Pool({
 pool.on("connect", () => {
   console.log("Connected to database ");
 });
+pool.on("connectionError", (error) => {
+  console.log("Something went wrong with db connection ", error);
+});
 
 export default pool;
