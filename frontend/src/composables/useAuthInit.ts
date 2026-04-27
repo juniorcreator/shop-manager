@@ -1,7 +1,7 @@
 import { onMounted } from 'vue';
 import { useUserStore } from '@/stores/user.ts';
 
-export function useAuthInit() {
+export const useAuthInit = () => {
   const userStore = useUserStore();
   onMounted(() => {
     try {
@@ -17,4 +17,4 @@ export function useAuthInit() {
       localStorage.removeItem('token');
     }
   });
-}
+};
