@@ -1,23 +1,30 @@
 import "dotenv/config";
 import jwt from "jsonwebtoken";
+import pool from "../config/db.js";
 
-export const authMiddleware = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res
-      .status(401)
-      .json({ message: "Немає токена або невірний формат" });
-  }
+export const authMiddleware = async (req, res, next) => {
+  try {
+    const token = req.cookies.token;
 
-  const token = authHeader.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ message: "Не авторизовано, немає токена" });
+    }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decodedPayload) => {
-    if (err)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await pool.query(
+      "SELECT id, name, email, surname, role FROM users WHERE id = $1",
+      [decoded.id],
+    );
+
+    if (user.rows.length === 0) {
       return res
-        .status(403)
-        .json({ message: "Токен недійсний або прострочений" });
-
-    req.user = decodedPayload;
+        .status(401)
+        .json({ message: "Не авторизовано, юзера не знайдено" });
+    }
+    req.user = user.rows[0];
     next();
-  });
+  } catch (error) {
+    console.error(error);
+    res.status(401).json({ message: "Не аворизовано, не валідний токен" });
+  }
 };

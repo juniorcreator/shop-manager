@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { useUserStore } from '@/stores/user.ts';
+import api from '@/api';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -91,21 +93,27 @@ const router = createRouter({
   ],
 });
 
-router.beforeEach(async (to, from) => {
-  const userJson = localStorage.getItem('user');
-  const user = userJson ? JSON.parse(userJson) : null;
-  const isAuthenticated = !!localStorage.getItem('token');
-  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+router.beforeEach(async (to) => {
+  const userStore = useUserStore();
 
-  if (requiresAuth && !isAuthenticated) {
-    return { path: '/' };
+  if (!userStore.isInitialized) {
+    try {
+      const res = await api.get('/me');
+      console.log(res, ' res in router.beforeEach');
+      userStore.setUser(res.data);
+    } catch (error) {
+      userStore.clearUser();
+    }
   }
-  if (to.path === '/login' && isAuthenticated) {
-    return { path: '/' };
+
+  if (to.meta.requiresAuth && !userStore.user) {
+    return '/login';
   }
-  if (to.meta.requiresAdmin && user?.role !== 'admin') {
+
+  if (to.meta.requiresAdmin && userStore.user?.role !== 'admin') {
     return '/';
   }
+
   return true;
 });
 

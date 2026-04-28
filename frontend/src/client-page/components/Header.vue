@@ -2,22 +2,19 @@
 import { ref, computed } from 'vue';
 import { navLinks } from '@/client-page/utils/constants.ts';
 import CartPopup from '@/client-page/components/CartPopup.vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import Button from 'primevue/button';
 import Avatar from 'primevue/avatar';
 import { useUserStore } from '@/stores/user.ts';
+import api from '@/api';
 
 const isCartVisible = ref(false);
 const router = useRouter();
-const route = useRoute();
 const userStore = useUserStore();
 
-const isLoggedIn = computed(() => {
-  return !!route.path && !!localStorage.getItem('token');
-});
-const handleLogOut = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
+const isLoggedIn = computed(() => !!userStore.user);
+const handleLogOut = async () => {
+  await api.post('/logout');
   userStore.clearUser();
   router.push('/login');
 };
@@ -43,6 +40,14 @@ const handleLogOut = () => {
               class="hover:text-lime-800 transition-colors p-1 rounded-md"
               :to="{ name: link.to }"
               >{{ link.name }}</RouterLink
+            >
+          </li>
+          <li v-if="userStore.user && userStore.user.role === 'admin'">
+            <RouterLink
+              active-class="bg-[#eee7d5]"
+              class="hover:text-lime-800 transition-colors p-1 rounded-md"
+              :to="{ name: 'admin' }"
+              >Admin</RouterLink
             >
           </li>
         </ul>

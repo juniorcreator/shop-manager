@@ -2,9 +2,6 @@ import pool from "../config/db.js";
 import bcrypt from "bcrypt";
 
 export const registerUserService = async (name, surname, email, password) => {
-  if (!name || !email || !password) {
-    throw new Error("Please provide all required fields");
-  }
   console.log(name, surname, email, password, " newUser");
   const isExists = await pool.query("select email from users where email=$1", [
     email,

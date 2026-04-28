@@ -1,10 +1,19 @@
-import { handleResponse } from "../utils/index.js";
+import { cookieOptions, handleResponse } from "../utils/index.js";
 import { registerUserService, loginUserService } from "../models/authModel.js";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
 
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "10m",
+  });
+};
+
 export const registerUser = async (req, res, next) => {
   const { name, surname, email, password } = req.body;
+  if (!name || !email || !password) {
+    handleResponse(res, 401, "Please provide all required fields");
+  }
   console.log(req.body, " req.body in createUser api");
   try {
     const newUser = await registerUserService(name, surname, email, password);
@@ -17,20 +26,17 @@ export const registerUser = async (req, res, next) => {
 };
 export const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
+  if (!email || !password) {
+    handleResponse(res, 400, "Please provide all required fields");
+  }
   console.log(req.body, " req.body in loginUser api");
   try {
     const user = await loginUserService(email, password);
-    const token = jwt.sign(
-      { id: user.id, role: user.role, email: user.email },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "10s",
-      },
-    );
-    console.log(user, "user loginUser");
-    handleResponse(res, 200, "User logged successfully api", { user, token });
+    const token = generateToken(user.id);
+    res.cookie("token", token, cookieOptions);
+
+    handleResponse(res, 200, "User logged successfully api", user);
   } catch (err) {
-    console.log(err, " loginUser api 11");
-    next(err);
+    next(err, " loginUser");
   }
 };

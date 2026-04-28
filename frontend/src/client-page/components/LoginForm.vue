@@ -14,23 +14,18 @@ import api from '@/api';
 
 const toast = useToast();
 const router = useRouter();
-const initialState = { email: '', password: '' };
+const initialState = { email: '44444@wedwedew.com', password: '12345' };
 const formData = reactive({ ...initialState });
 const userStore = useUserStore();
 
 const mutation = useMutation({
   mutationFn: async (user: Pick<User, 'email' | 'password'>) => {
-    const response = await api.post<{ data: { user: User; token: string } }>('/login', user);
-    console.log(response, 'response useMutation client');
-    return response;
+    return await api.post<{ data: User }>('/login', user);
   },
 
   onSuccess: (response) => {
-    console.log(response, 'response useMutation client login');
-    const { user, token } = response.data.data;
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-    userStore.setUser(user, token);
+    const { data: user } = response.data;
+    userStore.setUser(user);
     toast.add({
       severity: 'success',
       summary: 'Успіх',
@@ -42,8 +37,6 @@ const mutation = useMutation({
   },
   onError: (err: any) => {
     const errorMessage = err.response?.data?.message || 'Помилка при вході';
-    console.log(err.error, ' err onError client');
-    console.log(errorMessage, ' errorMessage');
     toast.add({
       severity: 'error',
       summary: 'Помилка',
@@ -60,8 +53,11 @@ const handleSubmit = (): void => {
 </script>
 
 <template>
-  <form @submit.prevent="handleSubmit" class="max-w-100 m-auto flex flex-col gap-2">
-    <div>Login Form</div>
+  <form
+    @submit.prevent="handleSubmit"
+    class="max-w-100 h-screen m-auto flex flex-col justify-center gap-2"
+  >
+    <h2 class="text-xl font-bold text-gray-800 text-center mb-2">Вхід</h2>
     <InputGroup>
       <InputGroupAddon>
         <i class="pi pi-envelope"></i>

@@ -4,14 +4,15 @@ import type { User } from '@/types';
 
 export const useUserStore = defineStore('user', () => {
   const user = ref<User | null>(null);
+  const isInitialized = ref(false);
   const token = ref<string | null>(null);
-  const setUser = (payloadUser: User, payloadToken: string) => {
+  const setUser = (payloadUser: User) => {
     user.value = payloadUser;
-    token.value = payloadToken;
+    isInitialized.value = true;
   };
   const clearUser = () => {
     user.value = null;
-    token.value = null;
+    isInitialized.value = true;
   };
-  return { user, token, setUser, clearUser };
+  return { user, isInitialized, token, setUser, clearUser };
 });

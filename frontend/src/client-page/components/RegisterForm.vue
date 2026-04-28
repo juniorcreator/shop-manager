@@ -20,7 +20,7 @@ const initialState = {
 };
 const formData = reactive({ ...initialState });
 const mutation = useMutation({
-  mutationFn: async (newUserData: Omit<User, 'id' | 'created_at'>) => {
+  mutationFn: async (newUserData: Omit<User, 'id' | 'created_at' | 'role'>) => {
     const response = await api.post<User>('/register', newUserData);
     console.log(response, 'response useMutation client');
     return response;
@@ -38,8 +38,6 @@ const mutation = useMutation({
   },
   onError: (err: any) => {
     const errorMessage = err.response?.data?.message || 'Помилка при реєстрації';
-    console.log(err.error, ' err onError client');
-    console.log(errorMessage, ' errorMessage');
     toast.add({
       severity: 'error',
       summary: 'Помилка',
@@ -56,7 +54,10 @@ const handleSubmit = (): void => {
 </script>
 
 <template>
-  <form @submit.prevent="handleSubmit" class="w-full max-w-sm m-auto flex flex-col gap-4">
+  <form
+    @submit.prevent="handleSubmit"
+    class="w-full max-w-sm h-screen m-auto flex flex-col justify-center gap-4"
+  >
     <h2 class="text-xl font-bold text-gray-800 text-center mb-2">Реєстрація</h2>
     <InputGroup>
       <InputGroupAddon>
