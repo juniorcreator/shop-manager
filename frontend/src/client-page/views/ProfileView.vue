@@ -14,7 +14,7 @@ import Rating from 'primevue/rating';
 import Footer from '@/client-page/components/Footer.vue';
 import type { User, Order, Comment } from '@/types';
 
-const user = ref<User>({
+const user = ref<Omit<User, 'role'>>({
   id: 1,
   name: 'Сергій',
   surname: 'Коваленко',
