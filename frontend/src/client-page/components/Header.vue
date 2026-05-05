@@ -62,8 +62,8 @@ const handleLogOut = async () => {
             to="/profile"
           >
             <Avatar
-              image="/front/images/default-avatar.avif"
-              class="mr-2"
+              :image="userStore.user!.image || '/front/images/default-avatar.avif'"
+              class="mr-2 object-cover"
               size="large"
               shape="circle"
             />

@@ -11,23 +11,29 @@ const generateToken = (id) => {
 
 export const registerUser = async (req, res, next) => {
   const { name, surname, email, password } = req.body;
+  const image = req.file ? req.file.location : null;
+
   if (!name || !email || !password) {
-    handleResponse(res, 401, "Please provide all required fields");
+    return handleResponse(res, 401, "Please provide all required fields");
   }
-  console.log(req.body, " req.body in createUser api");
+
   try {
-    const newUser = await registerUserService(name, surname, email, password);
-    console.log(newUser, "newUser createUser");
-    handleResponse(res, 201, "User created successfully api", newUser);
+    const newUser = await registerUserService(
+      name,
+      surname,
+      email,
+      password,
+      image,
+    );
+    handleResponse(res, 201, "User created successfully", newUser);
   } catch (err) {
-    console.log(err, " createUser api 11");
     next(err);
   }
 };
 export const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    handleResponse(res, 400, "Please provide all required fields");
+    return handleResponse(res, 400, "Please provide all required fields");
   }
   console.log(req.body, " req.body in loginUser api");
   try {

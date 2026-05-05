@@ -1,8 +1,14 @@
 import pool from "../config/db.js";
 import bcrypt from "bcrypt";
 
-export const registerUserService = async (name, surname, email, password) => {
-  console.log(name, surname, email, password, " newUser");
+export const registerUserService = async (
+  name,
+  surname,
+  email,
+  password,
+  image,
+) => {
+  console.log(name, surname, email, password, image, " newUser");
   const isExists = await pool.query("select email from users where email=$1", [
     email,
   ]);
@@ -13,8 +19,8 @@ export const registerUserService = async (name, surname, email, password) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const result = await pool.query(
-    "insert into users (name, surname, email, password) VALUES ($1, $2, $3, $4) returning *",
-    [name, surname, email, hashedPassword],
+    "insert into users (name, surname, email, password, image) VALUES ($1, $2, $3, $4, $5) returning *",
+    [name, surname, email, hashedPassword, image],
   );
   const newUser = result.rows[0];
   delete newUser.password;

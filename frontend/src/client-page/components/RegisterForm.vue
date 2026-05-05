@@ -4,10 +4,11 @@ import Button from 'primevue/button';
 import InputGroup from 'primevue/inputgroup';
 import Password from 'primevue/password';
 import InputText from 'primevue/inputtext';
+import FileUpload, { type FileUploadSelectEvent } from 'primevue/fileupload';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { useToast } from 'primevue/usetoast';
 import type { User } from '@/types';
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 import api from '@/api';
 
 const toast = useToast();
@@ -19,9 +20,24 @@ const initialState = {
   password: '',
 };
 const formData = reactive({ ...initialState });
+const selectedFile = ref<File | null>(null);
+const filePreview = ref<string | null>(null);
 const mutation = useMutation({
-  mutationFn: async (newUserData: Omit<User, 'id' | 'created_at' | 'role'>) => {
-    const response = await api.post<User>('/register', newUserData);
+  mutationFn: async () => {
+    const formDataToSend = new FormData();
+    formDataToSend.append('name', formData.name);
+    formDataToSend.append('email', formData.email);
+    formDataToSend.append('surname', formData.surname);
+    formDataToSend.append('password', formData.password);
+
+    if (selectedFile.value) {
+      formDataToSend.append('image', selectedFile.value);
+    }
+    const response = await api.post<User>('/register', formDataToSend, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     console.log(response, 'response useMutation client');
     return response;
   },
@@ -29,6 +45,8 @@ const mutation = useMutation({
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['users'] });
     Object.assign(formData, initialState);
+    selectedFile.value = null;
+    filePreview.value = null;
     toast.add({
       severity: 'success',
       summary: 'Успіх',
@@ -38,18 +56,23 @@ const mutation = useMutation({
   },
   onError: (err: any) => {
     const errorMessage = err.response?.data?.message || 'Помилка при реєстрації';
-    toast.add({
-      severity: 'error',
-      summary: 'Помилка',
-      detail: errorMessage,
-      life: 5000,
-    });
+    toast.add({ severity: 'error', summary: 'Помилка', detail: errorMessage, life: 5000 });
     console.error('Registration error:', err);
   },
 });
-
 const handleSubmit = (): void => {
-  mutation.mutate({ ...formData });
+  mutation.mutate();
+};
+
+const onFileSelect = (event: FileUploadSelectEvent) => {
+  const file = event.files[0];
+  const reader = new FileReader();
+
+  selectedFile.value = file;
+  reader.onload = async (e) => {
+    filePreview.value = e.target?.result as string;
+  };
+  reader.readAsDataURL(file);
 };
 </script>
 
@@ -106,6 +129,25 @@ const handleSubmit = (): void => {
         :feedback="false"
       />
     </InputGroup>
+    <InputGroup>
+      <div class="flex items-center gap-2 w-full">
+        <FileUpload
+          mode="basic"
+          @select="onFileSelect"
+          customUpload
+          auto
+          severity="contrast"
+          class="p-button-outlined"
+        />
+        <span v-if="!filePreview">No avatar uploaded <i class="pi pi-image"></i></span>
+        <img
+          v-if="filePreview"
+          :src="filePreview"
+          alt="Avatar"
+          class="shadow-md rounded-xl sm:w-35"
+        />
+      </div>
+    </InputGroup>
     <Button
       :label="mutation.isPending.value ? 'Реєстрація...' : 'Зареєструвати'"
       :disabled="mutation.isPending.value"
@@ -115,5 +157,4 @@ const handleSubmit = (): void => {
     />
   </form>
 </template>
-
 <style scoped></style>
