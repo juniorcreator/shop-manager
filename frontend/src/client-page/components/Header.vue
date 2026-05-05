@@ -53,8 +53,8 @@ const handleLogOut = async () => {
         </ul>
       </nav>
 
-      <div class="flex items-center gap-4 text-gray-700">
-        <div class="hidden sm:flex items-center gap-4 border-l border-gray-200 ml-2 pl-6">
+      <div class="flex items-center gap-2 text-gray-700">
+        <div class="hidden sm:flex items-center gap-2 border-l border-gray-200 ml-2 pl-6">
           <RouterLink
             v-if="isLoggedIn"
             active-class="text-emerald-600"

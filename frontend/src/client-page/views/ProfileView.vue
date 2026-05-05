@@ -13,7 +13,9 @@ import Tag from 'primevue/tag';
 import Rating from 'primevue/rating';
 import Footer from '@/client-page/components/Footer.vue';
 import type { User, Order, Comment } from '@/types';
+import { useUserStore } from '@/stores/user.ts';
 
+const userStore = useUserStore();
 const user = ref<Omit<User, 'role'>>({
   id: 1,
   name: 'Сергій',
@@ -23,8 +25,8 @@ const user = ref<Omit<User, 'role'>>({
 });
 
 const editForm = ref({
-  name: user.value.name,
-  surname: user.value.surname,
+  name: userStore.user?.name ?? '',
+  surname: userStore.user?.surname ?? '',
 });
 
 const userOrders = ref<Order[]>([
@@ -103,20 +105,28 @@ const getStatusSeverity = (status: string) => {
           </TabList>
 
           <TabPanels>
-            <TabPanel value="0">
+            <TabPanel v-if="userStore.user" value="0">
               <div class="py-6 max-w-md">
                 <div class="flex flex-col gap-4">
+                  <div class="flex items-center gap-2">
+                    <img
+                      :src="userStore.user.image || '/front/images/default-avatar.avif'"
+                      alt="Avatar"
+                      class="rounded-full object-cover size-25"
+                    />
+                    <button>change</button>
+                  </div>
                   <div class="flex flex-col gap-2">
-                    <label class="font-semibold text-gray-700">Ім'я</label>
+                    <label class="font-semibold text-gray-700">{{ userStore.user.name }}</label>
                     <InputText v-model="editForm.name" />
                   </div>
                   <div class="flex flex-col gap-2">
-                    <label class="font-semibold text-gray-700">Прізвище</label>
+                    <label class="font-semibold text-gray-700">{{ userStore.user.surname }}</label>
                     <InputText v-model="editForm.surname" />
                   </div>
                   <div class="flex flex-col gap-2">
                     <label class="font-semibold text-gray-700">Email</label>
-                    <InputText :value="user.email" disabled class="opacity-60" />
+                    <InputText :value="userStore.user.email" disabled class="opacity-60" />
                     <small class="text-gray-500">Email змінити неможливо</small>
                   </div>
                   <div class="mt-4">
