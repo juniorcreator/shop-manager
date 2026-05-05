@@ -60,12 +60,14 @@ const menuItems = [
           {{ menuItems.find((m) => m.to === route.name)?.label || 'Панель керування' }}
         </h2>
 
-        <div class="flex items-center gap-4">
+        <div v-if="userStore.user" class="flex items-center gap-4">
           <Button icon="pi pi-bell" severity="secondary" rounded text />
           <div class="flex items-center gap-3 pl-4 border-l border-gray-100">
             <div class="text-right">
-              <p class="text-sm font-bold text-gray-800 leading-tight">Адміністратор</p>
-              <p v-if="userStore.user" class="text-xs text-gray-500">{{ userStore.user.email }}}</p>
+              <p class="text-sm font-bold text-gray-800 leading-tight">
+                {{ userStore.user.name }} {{ userStore.user.surname }}
+              </p>
+              <p class="text-xs text-gray-500">{{ userStore.user.email }}}</p>
             </div>
             <div
               class="w-10 h-10 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-bold"
