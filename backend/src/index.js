@@ -5,18 +5,15 @@ import pool from "./config/db.js";
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/usersRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import productsRoutes from "./routes/productsRouter.js";
+import categoriesRoutes from "./routes/categoriesRouter.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL,
-    credentials: true,
-  }),
-);
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
@@ -29,8 +26,14 @@ app.get("/", async (req, res) => {
     db: db.rows[0].current_database,
   });
 });
+//users
 app.use("/api", userRoutes);
+//auth
 app.use("/api", authRoutes);
+//products
+app.use("/api", productsRoutes);
+//categories
+app.use("/api", categoriesRoutes);
 
 //error middleware
 app.use(errorHandler);

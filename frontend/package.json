@@ -11,6 +11,10 @@
     "type-check": "vue-tsc --build",
     "format": "prettier --write --experimental-cli src/"
   },
+  "prettier": {
+    "objectWrap": "collapse",
+    "printWidth": 110
+  },
   "dependencies": {
     "@primeuix/themes": "^2.0.3",
     "@tailwindcss/vite": "^4.2.4",
