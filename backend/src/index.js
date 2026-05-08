@@ -6,7 +6,7 @@ import cookieParser from "cookie-parser";
 import userRoutes from "./routes/usersRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import productsRoutes from "./routes/productsRouter.js";
-import categoriesRoutes from "./routes/categoriesRouter.js";
+import filtersRoutes from "./routes/filterRoutes.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 dotenv.config();
 
@@ -32,9 +32,8 @@ app.use("/api", userRoutes);
 app.use("/api", authRoutes);
 //products
 app.use("/api", productsRoutes);
-//categories
-app.use("/api", categoriesRoutes);
-
+//filters
+app.use("/api", filtersRoutes);
 //error middleware
 app.use(errorHandler);
 

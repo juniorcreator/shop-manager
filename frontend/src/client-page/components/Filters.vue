@@ -4,15 +4,14 @@ import Checkbox from "primevue/checkbox";
 import InputText from "primevue/inputtext";
 import IconField from "primevue/iconfield";
 import InputIcon from "primevue/inputicon";
-import { computed, onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useQuery } from "@tanstack/vue-query";
 import { useRoute, useRouter } from "vue-router";
 import api from "@/api";
 
 const fetchAllCategories = async () => {
-  const { data } = await api.get("/categories");
-  console.log("fetchAllCategories 1", data);
-  console.log("fetchAllCategories 2", data.data.categories);
+  const { data } = await api.get("/filterdata");
+  console.log("data.data.categories 2", data.data.categories);
   return data.data;
 };
 const {
@@ -23,8 +22,9 @@ const {
 
 const router = useRouter();
 const route = useRoute();
-const defaultPrice = [0, 2000];
-const priceRange = ref([...defaultPrice]);
+
+const initialLoad = ref(true);
+const priceRange = ref([0, 2000]);
 const searchQuery = ref("");
 const selectedCategories = ref<string[]>([]);
 let debounceTimer: ReturnType<typeof setTimeout>;
@@ -40,8 +40,11 @@ onMounted(() => {
   if (category) {
     selectedCategories.value = Array.isArray(category) ? (category as string[]) : [category as string];
   }
-  if (minPrice && maxPrice) {
-    priceRange.value = [Number(minPrice), Number(maxPrice)];
+  if (minPrice) {
+    priceRange.value[0] = Number(minPrice);
+  }
+  if (maxPrice) {
+    priceRange.value[1] = Number(maxPrice);
   }
 });
 
@@ -49,28 +52,108 @@ watch(
   [searchQuery, selectedCategories, priceRange],
   () => {
     clearTimeout(debounceTimer);
-
     debounceTimer = setTimeout(() => {
+      if (initialLoad.value) {
+        initialLoad.value = false;
+        return;
+      }
       const query: Record<string, any> = {};
 
       if (searchQuery.value) query.search = searchQuery.value;
       if (selectedCategories.value.length) query.category = selectedCategories.value;
-      if (priceRange.value[0] !== 0) query.minPrice = priceRange.value[0];
-      if (priceRange.value[1] !== 2000) query.maxPrice = priceRange.value[1];
+
+      if (collection.value?.prices) {
+        const minP = Number(collection.value.prices.min_price);
+        const maxP = Number(collection.value.prices.max_price);
+
+        if (priceRange.value[0] !== minP) query.minPrice = priceRange.value[0];
+        if (priceRange.value[1] !== maxP) query.maxPrice = priceRange.value[1];
+      }
 
       router.push({ query }).catch((err) => {
         console.log(err);
       });
-    }, 500);
+    }, 100);
   },
   { deep: true },
 );
 
+watch(
+  () => route.query,
+  (query) => {
+    const newSearch = (query.search as string) || "";
+    if (searchQuery.value !== newSearch) {
+      initialLoad.value = true;
+      searchQuery.value = newSearch;
+    }
+
+    const newCategories = query.category
+      ? Array.isArray(query.category)
+        ? (query.category as string[])
+        : [query.category as string]
+      : [];
+    if (JSON.stringify(selectedCategories.value) !== JSON.stringify(newCategories)) {
+      initialLoad.value = true;
+      selectedCategories.value = newCategories;
+    }
+
+    if (collection.value?.prices) {
+      const minFromQuery = query.minPrice !== undefined ? Number(query.minPrice) : null;
+      const maxFromQuery = query.maxPrice !== undefined ? Number(query.maxPrice) : null;
+
+      const defaultMin = Number(collection.value.prices.min_price);
+      const defaultMax = Number(collection.value.prices.max_price);
+
+      const newMin = minFromQuery !== null ? minFromQuery : defaultMin;
+      const newMax = maxFromQuery !== null ? maxFromQuery : defaultMax;
+
+      if (priceRange.value[0] !== newMin || priceRange.value[1] !== newMax) {
+        initialLoad.value = true;
+        priceRange.value = [newMin, newMax];
+      }
+    }
+  },
+  { deep: true },
+);
+
+watch(
+  collection,
+  (newCollection) => {
+    if (newCollection?.prices) {
+      const { minPrice, maxPrice } = route.query;
+      if (!minPrice) {
+        initialLoad.value = true;
+        priceRange.value[0] = Number(newCollection.prices.min_price);
+      }
+      if (!maxPrice) {
+        initialLoad.value = true;
+        priceRange.value[1] = Number(newCollection.prices.max_price);
+      }
+    }
+  },
+  { immediate: true },
+);
+
 const resetFilters = () => {
-  priceRange.value = [...defaultPrice];
-  searchQuery.value = "";
-  selectedCategories.value = [];
+  if (collection.value?.prices) {
+    const minP = Number(collection.value.prices.min_price);
+    const maxP = Number(collection.value.prices.max_price);
+    if (priceRange.value[0] !== minP || priceRange.value[1] !== maxP) {
+      initialLoad.value = false;
+      priceRange.value = [minP, maxP];
+    }
+  }
+  if (searchQuery.value !== "") {
+    initialLoad.value = false;
+    searchQuery.value = "";
+  }
+  if (selectedCategories.value.length > 0) {
+    initialLoad.value = false;
+    selectedCategories.value = [];
+  }
 };
+
+console.log("render");
 </script>
 
 <template>
@@ -131,6 +214,7 @@ const resetFilters = () => {
           </label>
         </div>
       </div>
+      <div v-else>Loading...</div>
     </div>
     <!-- price -->
     <div class="mb-4">
@@ -146,13 +230,19 @@ const resetFilters = () => {
           ]"
         ></i>
       </div>
-      <div v-show="!collapsedSections.price">
+      <div v-if="!isLoading" v-show="!collapsedSections.price">
         <div class="flex items-center justify-between text-sm text-gray-500 mb-6">
           <span class="bg-gray-50 px-3 py-1 rounded-md border border-gray-100">{{ priceRange[0] }} ₴</span>
           <span class="bg-gray-50 px-3 py-1 rounded-md border border-gray-100">{{ priceRange[1] }} ₴</span>
         </div>
         <div class="px-2">
-          <Slider v-model="priceRange" :min="0" :max="2000" range class="w-full" />
+          <Slider
+            v-model="priceRange"
+            :min="Number(collection.prices.min_price)"
+            :max="Number(collection.prices.max_price)"
+            range
+            class="w-full"
+          />
         </div>
       </div>
     </div>

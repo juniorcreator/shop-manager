@@ -10,13 +10,9 @@ import Footer from "@/client-page/components/Footer.vue";
 
 const route = useRoute();
 const fetchProducts = async ({ queryKey }: any) => {
-  console.log(queryKey[1], " queryKey");
   const params = queryKey[1];
   const queryParams = new URLSearchParams(params).toString();
-  console.log(queryParams, " queryParams");
   const { data } = await api.get(`/products?${queryParams}`);
-  console.log("Отправляем запрос с параметрами: 1", queryParams);
-  console.log("Отправляем запрос с параметрами: 2", data.data);
   return data.data;
 };
 
@@ -28,6 +24,7 @@ const {
   queryKey: computed(() => ["products", route.query]),
   queryFn: fetchProducts,
   staleTime: 1000 * 60 * 5,
+  placeholderData: (prev) => prev,
 });
 </script>
 
