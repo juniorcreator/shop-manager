@@ -35,7 +35,6 @@ export const loginUser = async (req, res, next) => {
   if (!email || !password) {
     return handleResponse(res, 400, "Please provide all required fields");
   }
-  console.log(req.body, " req.body in loginUser api");
   try {
     const user = await loginUserService(email, password);
     const token = generateToken(user.id);
