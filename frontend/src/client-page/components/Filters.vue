@@ -7,18 +7,13 @@ import InputIcon from "primevue/inputicon";
 import { onMounted, ref, watch } from "vue";
 import { useQuery } from "@tanstack/vue-query";
 import { useRoute, useRouter } from "vue-router";
-import api from "@/api";
+import { fetchFilterData } from "@/client-page/utils/api.ts";
 
-const fetchAllCategories = async () => {
-  const { data } = await api.get("/filterdata");
-  console.log("data.data.categories 2", data.data.categories);
-  return data.data;
-};
 const {
   data: collection,
   isLoading,
   isError,
-} = useQuery({ queryKey: ["categories"], queryFn: fetchAllCategories, staleTime: 1000 * 60 * 5 });
+} = useQuery({ queryKey: ["categories"], queryFn: fetchFilterData, staleTime: 1000 * 60 * 5 });
 
 const router = useRouter();
 const route = useRoute();
@@ -71,7 +66,7 @@ watch(
       }
 
       router.push({ query }).catch((err) => {
-        console.log(err);
+        console.log("query error =>", err);
       });
     }, 400);
   },
@@ -119,6 +114,7 @@ watch(
 watch(
   collection,
   (newCollection) => {
+    console.log(collection.value, " collection");
     if (newCollection?.prices) {
       const { minPrice, maxPrice } = route.query;
       if (!minPrice) {
@@ -199,7 +195,7 @@ console.log("render");
         ></i>
       </div>
       <div v-if="!isLoading" v-show="!collapsedSections.categories" class="flex flex-col gap-3">
-        <div v-for="category of collection.categories" :key="category.slug" class="flex items-center gap-3">
+        <div v-for="category of collection?.categories" :key="category.slug" class="flex items-center gap-3">
           <Checkbox
             v-model="selectedCategories"
             :inputId="category.slug"
@@ -238,8 +234,8 @@ console.log("render");
         <div class="px-2">
           <Slider
             v-model="priceRange"
-            :min="Number(collection.prices.min_price)"
-            :max="Number(collection.prices.max_price)"
+            :min="Number(collection?.prices.min_price)"
+            :max="Number(collection?.prices.max_price)"
             range
             class="w-full"
           />

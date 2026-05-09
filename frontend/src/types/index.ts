@@ -28,6 +28,14 @@ export interface Category {
   image: string;
   subcategories: Subcategory[];
 }
+export interface Prices {
+  min_price: number;
+  max_price: number;
+}
+export interface FilterDataResponse {
+  categories: Category[];
+  prices: Prices;
+}
 export interface Product {
   id: number;
   name: string;
@@ -54,7 +62,7 @@ export interface OrderItem {
   price: number;
 }
 
-export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
 
 export interface Order {
   id: number;
