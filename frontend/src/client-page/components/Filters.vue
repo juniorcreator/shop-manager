@@ -73,7 +73,7 @@ watch(
       router.push({ query }).catch((err) => {
         console.log(err);
       });
-    }, 100);
+    }, 400);
   },
   { deep: true },
 );
