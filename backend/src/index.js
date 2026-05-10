@@ -7,6 +7,7 @@ import userRoutes from "./routes/usersRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import productsRoutes from "./routes/productsRouter.js";
 import filtersRoutes from "./routes/filterRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 dotenv.config();
 
@@ -34,6 +35,9 @@ app.use("/api", authRoutes);
 app.use("/api", productsRoutes);
 //filters
 app.use("/api", filtersRoutes);
+//profile
+app.use("/api", profileRoutes);
+
 //error middleware
 app.use(errorHandler);
 

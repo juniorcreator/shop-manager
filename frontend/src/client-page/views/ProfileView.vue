@@ -1,86 +1,121 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import Tabs from 'primevue/tabs';
-import TabList from 'primevue/tablist';
-import Tab from 'primevue/tab';
-import TabPanels from 'primevue/tabpanels';
-import TabPanel from 'primevue/tabpanel';
-import InputText from 'primevue/inputtext';
-import Button from 'primevue/button';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Tag from 'primevue/tag';
-import Rating from 'primevue/rating';
-import Footer from '@/client-page/components/Footer.vue';
-import type { User, Order, Comment } from '@/types';
-import { useUserStore } from '@/stores/user.ts';
+import { reactive, ref } from "vue";
+import Tabs from "primevue/tabs";
+import TabList from "primevue/tablist";
+import Tab from "primevue/tab";
+import TabPanels from "primevue/tabpanels";
+import TabPanel from "primevue/tabpanel";
+import InputText from "primevue/inputtext";
+import Button from "primevue/button";
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
+import Tag from "primevue/tag";
+import Rating from "primevue/rating";
+import Footer from "@/client-page/components/Footer.vue";
+import type { User, Order, Comment } from "@/types";
+import { useUserStore } from "@/stores/user.ts";
+import Image from "primevue/image";
+import { useMutation, useQueryClient } from "@tanstack/vue-query";
+import api from "@/api";
+import { useToast } from "primevue/usetoast";
+import FileUpload, { type FileUploadSelectEvent } from "primevue/fileupload";
 
+const toast = useToast();
+const queryClient = useQueryClient();
 const userStore = useUserStore();
-const user = ref<Omit<User, 'role'>>({
-  id: 1,
-  name: 'Сергій',
-  surname: 'Коваленко',
-  email: 'serhii@example.com',
-  created_at: new Date('2024-01-15'),
+const editForm = reactive({
+  id: userStore.user?.id ?? "",
+  name: userStore.user?.name ?? "",
+  surname: userStore.user?.surname ?? "",
+  phone: userStore.user?.phone ?? "",
+  image: userStore.user?.image ?? "",
 });
-
-const editForm = ref({
-  name: userStore.user?.name ?? '',
-  surname: userStore.user?.surname ?? '',
-});
-
 const userOrders = ref<Order[]>([
   {
     id: 1001,
-    customer_name: 'Сергій Коваленко',
-    customer_email: 'serhii@example.com',
-    customer_phone: '+380991234567',
-    delivery_address: 'Київ, вул. Центральна, 5',
-    payment_method: 'card',
-    status: 'delivered',
+    customer_name: "Сергій Коваленко",
+    customer_email: "serhii@example.com",
+    customer_phone: "+380991234567",
+    delivery_address: "Київ, вул. Центральна, 5",
+    payment_method: "card",
+    status: "delivered",
     total_price: 1540,
-    created_at: '2026-04-10',
+    created_at: "2026-04-10",
     items: [],
   },
 ]);
-
 const userComments = ref<Comment[]>([
   {
     id: 1,
     product_id: 1,
     product_name: 'Насіння соняшника "Гігант"',
     user_id: 1,
-    text: 'Дуже гарне насіння, зійшло швидко!',
+    text: "Дуже гарне насіння, зійшло швидко!",
     rating: 5,
-    created_at: '2026-04-12',
+    created_at: "2026-04-12",
   },
 ]);
-
-const handleUpdateProfile = () => {
-  user.value.name = editForm.value.name;
-  user.value.surname = editForm.value.surname;
-  alert('Профіль оновлено успішно!');
-};
-
 const getStatusSeverity = (status: string) => {
   switch (status) {
-    case 'pending':
-      return 'warn';
-    case 'delivered':
-      return 'success';
-    case 'cancelled':
-      return 'danger';
+    case "pending":
+      return "warn";
+    case "delivered":
+      return "success";
+    case "cancelled":
+      return "danger";
     default:
-      return 'info';
+      return "info";
   }
 };
+const selectedFile = ref<File | null>(null);
+const filePreview = ref<string | null>(null);
+
+const handleUpdateProfile = async () => {
+  if (!editForm.name || !editForm.surname) {
+    throw new Error("Форма не может быть пустой");
+  }
+  const formDataToSend = new FormData();
+  formDataToSend.append("name", editForm.name);
+  formDataToSend.append("surname", editForm.surname);
+  formDataToSend.append("phone", editForm.phone);
+
+  if (selectedFile.value) {
+    formDataToSend.append("image", selectedFile.value);
+  }
+
+  const data = await api.put<User>("/profile", formDataToSend, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data.data;
+};
+
+const onFileSelect = (event: FileUploadSelectEvent) => {
+  const file = event.files[0];
+  const reader = new FileReader();
+  selectedFile.value = file;
+  reader.onload = async (e) => {
+    filePreview.value = e.target?.result as string;
+  };
+  reader.readAsDataURL(file);
+};
+
+const { isPending, isError, error, mutate } = useMutation({
+  mutationFn: handleUpdateProfile,
+  onSuccess: (updatedUser: User) => {
+    userStore.setUser({ ...userStore.user, ...updatedUser });
+    queryClient.invalidateQueries({ queryKey: ["profile"] });
+    toast.add({ severity: "success", summary: "Профайл оновлений", life: 1500 });
+  },
+  onError: (err: any) => {
+    toast.add({ severity: "error", summary: err.response?.data?.message || err.message, life: 3000 });
+  },
+});
 </script>
 
 <template>
   <div class="container mx-auto px-4 py-8 min-h-[calc(100vh-200px)]">
     <div class="max-w-4xl mx-auto">
       <h1 class="text-3xl font-bold mb-8 text-gray-800">Мій профіль</h1>
-
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <Tabs value="0">
           <TabList>
@@ -108,35 +143,65 @@ const getStatusSeverity = (status: string) => {
             <TabPanel v-if="userStore.user" value="0">
               <div class="py-6 max-w-md">
                 <div class="flex flex-col gap-4">
-                  <div class="flex items-center gap-2">
-                    <img
-                      :src="userStore.user.image || '/front/images/default-avatar.avif'"
-                      alt="Avatar"
-                      class="rounded-full object-cover size-25"
-                    />
-                    <button>change</button>
-                  </div>
-                  <div class="flex flex-col gap-2">
-                    <label class="font-semibold text-gray-700">{{ userStore.user.name }}</label>
-                    <InputText v-model="editForm.name" />
-                  </div>
-                  <div class="flex flex-col gap-2">
-                    <label class="font-semibold text-gray-700">{{ userStore.user.surname }}</label>
-                    <InputText v-model="editForm.surname" />
-                  </div>
-                  <div class="flex flex-col gap-2">
-                    <label class="font-semibold text-gray-700">Email</label>
-                    <InputText :value="userStore.user.email" disabled class="opacity-60" />
-                    <small class="text-gray-500">Email змінити неможливо</small>
-                  </div>
-                  <div class="mt-4">
-                    <Button
-                      label="Зберегти зміни"
-                      icon="pi pi-check"
-                      @click="handleUpdateProfile"
-                      class="w-full sm:w-auto"
-                    />
-                  </div>
+                  <form @submit.prevent="mutate()">
+                    <div class="flex items-center gap-2">
+                      <Image
+                        :src="
+                          filePreview
+                            ? filePreview
+                            : userStore.user.image || '/front/images/default-avatar.avif'
+                        "
+                        alt="Avatar"
+                        class="rounded-full"
+                        imageClass="size-28"
+                        preview
+                      />
+                      <div class="">
+                        <FileUpload
+                          :showUploadButton="false"
+                          chooseLabel=" "
+                          chooseIcon="pi pi-file-edit"
+                          icon="pi pi-user"
+                          mode="basic"
+                          @select="onFileSelect"
+                          customUpload
+                          auto
+                        />
+                      </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                      <label class="font-semibold text-gray-700">Name</label>
+                      <InputText required minlength="3" v-model="editForm.name" />
+                    </div>
+                    <div class="flex flex-col gap-2">
+                      <label class="font-semibold text-gray-700">Surname</label>
+                      <InputText minlength="3" v-model="editForm.surname" />
+                    </div>
+                    <div class="flex flex-col gap-2">
+                      <label class="font-semibold text-gray-700">Phone</label>
+                      <InputText
+                        type="tel"
+                        minlength="9"
+                        :placeholder="userStore.user.phone ?? 'Enter your phone'"
+                        v-model="editForm.phone"
+                      />
+                    </div>
+                    <div class="flex flex-col gap-2">
+                      <label class="font-semibold text-gray-700">Email</label>
+                      <InputText :value="userStore.user.email" disabled class="opacity-60" />
+                      <small class="text-gray-500">Email змінити неможливо</small>
+                    </div>
+                    <div v-if="isError" class="text-red-400">{{ error }}</div>
+                    <div class="mt-4">
+                      <Button
+                        type="submit"
+                        label="Зберегти зміни"
+                        class="w-full sm:w-auto"
+                        :disabled="isPending"
+                        :loading="isPending"
+                      />
+                    </div>
+                  </form>
                 </div>
               </div>
             </TabPanel>

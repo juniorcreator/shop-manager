@@ -6,6 +6,7 @@ export interface User {
   password?: string;
   image?: string | null;
   role: string;
+  phone?: string;
   created_at: Date;
 }
 

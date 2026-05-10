@@ -6,6 +6,8 @@ export const handleResponse = (res, status, message, data = null) => {
   });
 };
 
+export const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export const cookieOptions = {
   httpOnly: true,
   secure: true,
