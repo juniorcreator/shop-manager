@@ -1,49 +1,39 @@
 <script setup lang="ts">
-import InputGroupAddon from 'primevue/inputgroupaddon';
-import Button from 'primevue/button';
-import InputGroup from 'primevue/inputgroup';
-import Password from 'primevue/password';
-import InputText from 'primevue/inputtext';
-import { useMutation } from '@tanstack/vue-query';
-import { reactive } from 'vue';
-import { useToast } from 'primevue/usetoast';
-import { useRouter } from 'vue-router';
-import type { User } from '@/types';
-import { useUserStore } from '@/stores/user.ts';
-import api from '@/api';
+import InputGroupAddon from "primevue/inputgroupaddon";
+import Button from "primevue/button";
+import InputGroup from "primevue/inputgroup";
+import Password from "primevue/password";
+import InputText from "primevue/inputtext";
+import { useMutation } from "@tanstack/vue-query";
+import { reactive } from "vue";
+import { useToast } from "primevue/usetoast";
+import { useRouter } from "vue-router";
+import type { User } from "@/types";
+import { useUserStore } from "@/stores/user.ts";
+import api from "@/api";
 
 const toast = useToast();
 const router = useRouter();
-const initialState = { email: '44444@wedwedew.com', password: '12345' };
+const initialState = { email: "44444@wedwedew.com", password: "12345" };
 const formData = reactive({ ...initialState });
 const userStore = useUserStore();
 
 const mutation = useMutation({
-  mutationFn: async (user: Pick<User, 'email' | 'password'>) => {
-    return await api.post<{ data: User }>('/login', user);
+  mutationFn: async (user: Pick<User, "email" | "password">) => {
+    return await api.post<{ data: User }>("/login", user);
   },
 
   onSuccess: (response) => {
     const { data: user } = response.data;
     userStore.setUser(user);
-    toast.add({
-      severity: 'success',
-      summary: 'Успіх',
-      detail: 'Користувача успішно залогігений',
-      life: 3000,
-    });
+    toast.add({ severity: "success", summary: "Користувача успішно залогігений", life: 1500 });
     Object.assign(formData, initialState);
-    router.push('/');
+    router.push("/");
   },
   onError: (err: any) => {
-    const errorMessage = err.response?.data?.message || 'Помилка при вході';
-    toast.add({
-      severity: 'error',
-      summary: 'Помилка',
-      detail: errorMessage,
-      life: 5000,
-    });
-    console.error('Login error:', err);
+    const errorMessage = err.response?.data?.message || "Помилка при вході";
+    toast.add({ severity: "error", summary: errorMessage, life: 5000 });
+    console.error("Login error:", err);
   },
 });
 
@@ -53,10 +43,7 @@ const handleSubmit = (): void => {
 </script>
 
 <template>
-  <form
-    @submit.prevent="handleSubmit"
-    class="max-w-100 h-screen m-auto flex flex-col justify-center gap-2"
-  >
+  <form @submit.prevent="handleSubmit" class="max-w-100 h-screen m-auto flex flex-col justify-center gap-2">
     <h2 class="text-xl font-bold text-gray-800 text-center mb-2">Вхід</h2>
     <InputGroup>
       <InputGroupAddon>

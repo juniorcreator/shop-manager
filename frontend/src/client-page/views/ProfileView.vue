@@ -18,11 +18,13 @@ import Image from "primevue/image";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import api from "@/api";
 import { useToast } from "primevue/usetoast";
-import FileUpload, { type FileUploadSelectEvent } from "primevue/fileupload";
+import FileUpload from "primevue/fileupload";
+import { useFileUpload } from "@/composables/useFileUpload.ts";
 
 const toast = useToast();
 const queryClient = useQueryClient();
 const userStore = useUserStore();
+const { selectedFile, filePreview, onFileSelect } = useFileUpload();
 const editForm = reactive({
   id: userStore.user?.id ?? "",
   name: userStore.user?.name ?? "",
@@ -67,8 +69,6 @@ const getStatusSeverity = (status: string) => {
       return "info";
   }
 };
-const selectedFile = ref<File | null>(null);
-const filePreview = ref<string | null>(null);
 
 const handleUpdateProfile = async () => {
   if (!editForm.name || !editForm.surname) {
@@ -87,16 +87,6 @@ const handleUpdateProfile = async () => {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return data.data;
-};
-
-const onFileSelect = (event: FileUploadSelectEvent) => {
-  const file = event.files[0];
-  const reader = new FileReader();
-  selectedFile.value = file;
-  reader.onload = async (e) => {
-    filePreview.value = e.target?.result as string;
-  };
-  reader.readAsDataURL(file);
 };
 
 const { isPending, isError, error, mutate } = useMutation({
