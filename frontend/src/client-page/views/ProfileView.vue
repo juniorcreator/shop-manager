@@ -143,21 +143,17 @@ const { isPending, isError, error, mutate } = useMutation({
                         "
                         alt="Avatar"
                         class="rounded-full"
-                        imageClass="size-28"
+                        imageClass="size-34"
                         preview
                       />
-                      <div class="">
-                        <FileUpload
-                          :showUploadButton="false"
-                          chooseLabel=" "
-                          chooseIcon="pi pi-file-edit"
-                          icon="pi pi-user"
-                          mode="basic"
-                          @select="onFileSelect"
-                          customUpload
-                          auto
-                        />
-                      </div>
+                      <FileUpload
+                        chooseIcon="pi pi-file-edit"
+                        :chooseButtonProps="{ severity: 'info', size: 'small', variant: 'text' }"
+                        mode="basic"
+                        @select="onFileSelect"
+                        customUpload
+                        auto
+                      />
                     </div>
                     <div class="flex flex-col gap-2">
                       <label class="font-semibold text-gray-700">Name</label>
