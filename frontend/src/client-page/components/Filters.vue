@@ -4,10 +4,13 @@ import Checkbox from "primevue/checkbox";
 import InputText from "primevue/inputtext";
 import IconField from "primevue/iconfield";
 import InputIcon from "primevue/inputicon";
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useQuery } from "@tanstack/vue-query";
 import { useRoute, useRouter } from "vue-router";
 import { fetchFilterData } from "@/client-page/utils/api.ts";
+
+const router = useRouter();
+const route = useRoute();
 
 const {
   data: collection,
@@ -15,138 +18,49 @@ const {
   isError,
 } = useQuery({ queryKey: ["categories"], queryFn: fetchFilterData, staleTime: 1000 * 60 * 5 });
 
-const router = useRouter();
-const route = useRoute();
+const minBound = computed(() => Number(collection.value?.prices?.min_price ?? 0));
+const maxBound = computed(() => Number(collection.value?.prices?.max_price ?? 2000));
 
-const initialLoad = ref(true);
-const priceRange = ref([0, 2000]);
-const searchQuery = ref("");
-const selectedCategories = ref<string[]>([]);
+const searchQuery = computed({
+  get: () => (route.query.search as string) || "",
+  set: (val) => updateQuery({ search: val || undefined }),
+});
+
+const selectedCategories = computed({
+  get: () => {
+    const category = route.query.category;
+    return category ? ((Array.isArray(category) ? category : [category]) as string[]) : [];
+  },
+  set: (val) => updateQuery({ category: val.length ? val : undefined }),
+});
+
+const priceRange = computed({
+  get: () => [
+    route.query.minPrice !== undefined ? Number(route.query.minPrice) : minBound.value,
+    route.query.maxPrice !== undefined ? Number(route.query.maxPrice) : maxBound.value,
+  ],
+  set: ([min, max]) =>
+    updateQuery({
+      minPrice: min !== minBound.value ? min : undefined,
+      maxPrice: max !== maxBound.value ? max : undefined,
+    }),
+});
+
 let debounceTimer: ReturnType<typeof setTimeout>;
+const updateQuery = (patch: Record<string, any>) => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    router.push({ query: { ...route.query, ...patch } });
+  }, 400);
+};
+
+const resetFilters = () => {
+  router.push({ query: {} });
+};
 
 const collapsedSections = ref({ search: false, categories: false, price: false });
 const toggleSection = (section: keyof typeof collapsedSections.value) => {
   collapsedSections.value[section] = !collapsedSections.value[section];
-};
-
-onMounted(() => {
-  const { search, category, minPrice, maxPrice } = route.query;
-  if (search) searchQuery.value = search as string;
-  if (category) {
-    selectedCategories.value = Array.isArray(category) ? (category as string[]) : [category as string];
-  }
-  if (minPrice) {
-    priceRange.value[0] = Number(minPrice);
-  }
-  if (maxPrice) {
-    priceRange.value[1] = Number(maxPrice);
-  }
-});
-
-watch(
-  [searchQuery, selectedCategories, priceRange],
-  () => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      if (initialLoad.value) {
-        initialLoad.value = false;
-        return;
-      }
-      const query: Record<string, any> = {};
-
-      if (searchQuery.value) query.search = searchQuery.value;
-      if (selectedCategories.value.length) query.category = selectedCategories.value;
-
-      if (collection.value?.prices) {
-        const minP = Number(collection.value.prices.min_price);
-        const maxP = Number(collection.value.prices.max_price);
-
-        if (priceRange.value[0] !== minP) query.minPrice = priceRange.value[0];
-        if (priceRange.value[1] !== maxP) query.maxPrice = priceRange.value[1];
-      }
-
-      router.push({ query }).catch((err) => {
-        console.log("query error =>", err);
-      });
-    }, 400);
-  },
-  { deep: true },
-);
-
-watch(
-  () => route.query,
-  (query) => {
-    const newSearch = (query.search as string) || "";
-    if (searchQuery.value !== newSearch) {
-      initialLoad.value = true;
-      searchQuery.value = newSearch;
-    }
-
-    const newCategories = query.category
-      ? Array.isArray(query.category)
-        ? (query.category as string[])
-        : [query.category as string]
-      : [];
-    if (JSON.stringify(selectedCategories.value) !== JSON.stringify(newCategories)) {
-      initialLoad.value = true;
-      selectedCategories.value = newCategories;
-    }
-
-    if (collection.value?.prices) {
-      const minFromQuery = query.minPrice !== undefined ? Number(query.minPrice) : null;
-      const maxFromQuery = query.maxPrice !== undefined ? Number(query.maxPrice) : null;
-
-      const defaultMin = Number(collection.value.prices.min_price);
-      const defaultMax = Number(collection.value.prices.max_price);
-
-      const newMin = minFromQuery !== null ? minFromQuery : defaultMin;
-      const newMax = maxFromQuery !== null ? maxFromQuery : defaultMax;
-
-      if (priceRange.value[0] !== newMin || priceRange.value[1] !== newMax) {
-        initialLoad.value = true;
-        priceRange.value = [newMin, newMax];
-      }
-    }
-  },
-  { deep: true },
-);
-
-watch(
-  collection,
-  (newCollection) => {
-    console.log(collection.value, " collection");
-    if (newCollection?.prices) {
-      const { minPrice, maxPrice } = route.query;
-      if (!minPrice) {
-        initialLoad.value = true;
-        priceRange.value[0] = Number(newCollection.prices.min_price);
-      }
-      if (!maxPrice) {
-        initialLoad.value = true;
-        priceRange.value[1] = Number(newCollection.prices.max_price);
-      }
-    }
-  },
-  { immediate: true },
-);
-
-const resetFilters = () => {
-  if (collection.value?.prices) {
-    const minP = Number(collection.value.prices.min_price);
-    const maxP = Number(collection.value.prices.max_price);
-    if (priceRange.value[0] !== minP || priceRange.value[1] !== maxP) {
-      initialLoad.value = false;
-      priceRange.value = [minP, maxP];
-    }
-  }
-  if (searchQuery.value !== "") {
-    initialLoad.value = false;
-    searchQuery.value = "";
-  }
-  if (selectedCategories.value.length > 0) {
-    initialLoad.value = false;
-    selectedCategories.value = [];
-  }
 };
 
 console.log("render");
