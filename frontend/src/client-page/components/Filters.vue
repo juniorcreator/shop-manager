@@ -51,7 +51,7 @@ const updateQuery = (patch: Record<string, any>) => {
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(() => {
     router.push({ query: { ...route.query, ...patch } });
-  }, 400);
+  }, 200);
 };
 
 const resetFilters = () => {
