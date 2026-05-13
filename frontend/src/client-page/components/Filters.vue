@@ -4,7 +4,7 @@ import Checkbox from "primevue/checkbox";
 import InputText from "primevue/inputtext";
 import IconField from "primevue/iconfield";
 import InputIcon from "primevue/inputicon";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import { useQuery } from "@tanstack/vue-query";
 import { useRoute, useRouter } from "vue-router";
 import { fetchFilterData } from "@/client-page/utils/api.ts";
@@ -16,11 +16,12 @@ const {
   data: collection,
   isLoading,
   isError,
-} = useQuery({ queryKey: ["categories"], queryFn: fetchFilterData, staleTime: 1000 * 60 * 5 });
+} = useQuery({ queryKey: ["filters"], queryFn: fetchFilterData, staleTime: 1000 * 60 * 5 });
 
+let debounceTimer: ReturnType<typeof setTimeout>;
 const minBound = computed(() => Number(collection.value?.prices?.min_price ?? 0));
 const maxBound = computed(() => Number(collection.value?.prices?.max_price ?? 2000));
-
+const collapsedSections = ref({ search: false, categories: false, price: false });
 const searchQuery = computed({
   get: () => (route.query.search as string) || "",
   set: (val) => updateQuery({ search: val || undefined }),
@@ -46,7 +47,6 @@ const priceRange = computed({
     }),
 });
 
-let debounceTimer: ReturnType<typeof setTimeout>;
 const updateQuery = (patch: Record<string, any>) => {
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(() => {
@@ -58,7 +58,6 @@ const resetFilters = () => {
   router.push({ query: {} });
 };
 
-const collapsedSections = ref({ search: false, categories: false, price: false });
 const toggleSection = (section: keyof typeof collapsedSections.value) => {
   collapsedSections.value[section] = !collapsedSections.value[section];
 };

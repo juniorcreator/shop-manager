@@ -8,6 +8,7 @@ import authRoutes from "./routes/authRoutes.js";
 import productsRoutes from "./routes/productsRouter.js";
 import filtersRoutes from "./routes/filterRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
+import categoriesRotes from "./routes/categoriesRoutes.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 dotenv.config();
 
@@ -33,6 +34,8 @@ app.use("/api", userRoutes);
 app.use("/api", authRoutes);
 //products
 app.use("/api", productsRoutes);
+//products
+app.use("/api", categoriesRotes);
 //filters
 app.use("/api", filtersRoutes);
 //profile

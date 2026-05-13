@@ -6,3 +6,8 @@ export const fetchFilterData = async (): Promise<FilterDataResponse> => {
   console.log("data.data.categories 2", data.data.categories);
   return data.data;
 };
+
+export const fetchCategories = async () => {
+  const { data } = await api.get("/categories");
+  return data.data;
+};

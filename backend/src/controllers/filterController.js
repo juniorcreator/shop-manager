@@ -1,6 +1,6 @@
 import { handleResponse } from "../utils/index.js";
 import pool from "../config/db.js";
-import redis from "../utils/redis.js";
+import redis from "../config/redis.js";
 
 export const getFilterData = async (req, res, next) => {
   const CACHE_KEY = "filters_data";
